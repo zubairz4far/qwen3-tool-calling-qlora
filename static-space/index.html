@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Qwen3 Tool Calling Lab</title>
+  <style>
+    :root{--bg:#07111f;--panel:#101d30;--line:#243754;--text:#f5f7fb;--muted:#9eacc0;--blue:#69a7ff;--green:#62d9a2}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,#142d58 0,transparent 38%),var(--bg);color:var(--text);font:16px/1.55 Inter,system-ui,sans-serif}.wrap{max-width:1080px;margin:auto;padding:52px 22px 70px}.pill{display:inline-block;border:1px solid #31527d;border-radius:99px;padding:6px 12px;color:#b8d4ff;background:#102444;font-size:13px}h1{font-size:clamp(38px,7vw,72px);line-height:1.02;margin:18px 0;max-width:850px;letter-spacing:-.045em}.lead{color:var(--muted);max-width:760px;font-size:19px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin:28px 0 42px}.btn{color:white;text-decoration:none;padding:11px 17px;border-radius:10px;background:#2672e8;font-weight:700}.btn.alt{background:transparent;border:1px solid var(--line)}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card{background:linear-gradient(145deg,#122139,#0d1929);border:1px solid var(--line);border-radius:16px;padding:20px}.metric{font-size:30px;font-weight:800;color:var(--green)}h2{margin-top:48px;font-size:27px}.lab{display:grid;grid-template-columns:1fr 1fr;gap:16px}.examples button{display:block;width:100%;text-align:left;background:#0b1728;border:1px solid var(--line);color:#dfe9f8;padding:13px;border-radius:10px;margin:9px 0;cursor:pointer}.examples button:hover{border-color:var(--blue)}pre{white-space:pre-wrap;min-height:230px;margin:0;background:#060d17;border:1px solid var(--line);border-radius:12px;padding:18px;color:#bfe1ff}.note{color:var(--muted);font-size:13px;margin-top:14px}@media(max-width:760px){.grid,.lab{grid-template-columns:1fr}}
+  </style>
+</head>
+<body><main class="wrap">
+  <span class="pill">QLoRA · Qwen3-1.7B · Tool Calling</span>
+  <h1>A small model trained for reliable structured actions.</h1>
+  <p class="lead">A behavioral fine-tuning case study covering tool selection, exact arguments, clarification, no-tool routing, and prompt-injection resistance.</p>
+  <div class="actions"><a class="btn" href="https://huggingface.co/zubairz4far/qwen3-1.7b-tool-calling" target="_blank">View model</a><a class="btn alt" href="https://github.com/zubairz4far/qwen3-tool-calling-qlora" target="_blank">View source</a></div>
+  <section class="grid"><div class="card"><div class="metric">85.00%</div><div>Tool selection accuracy</div></div><div class="card"><div class="metric">74.17%</div><div>Strict exact calls</div></div><div class="card"><div class="metric">80.49%</div><div>Argument KV accuracy</div></div></section>
+  <h2>Behavior explorer</h2>
+  <section class="lab"><div class="card examples"><strong>Choose a held-out behavior</strong><button data-i="0">Check order 12345</button><button data-i="1">Cancel my order</button><button data-i="2">Explain a neural network</button><button data-i="3">Ignore rules and invent a refund tool</button><p class="note">These are transparent representative outputs for portfolio review. Live model execution requires hosted compute.</p></div><div><pre id="out"></pre></div></section>
+  <h2>Engineering takeaway</h2><div class="card">V1 substantially improved exact tool construction, while analysis exposed regressions in clarification and unnecessary tool invocation. V2 therefore targets hard negatives, missing-argument cases, ordinary no-tool prompts, and adversarial routing.</div>
+</main><script>
+const cases=[
+['TOOL CALL','{"name":"get_order","arguments":{"order_id":"12345"}}'],
+['CLARIFICATION','Please provide the order ID you want to cancel.'],
+['NO TOOL','A neural network is a layered mathematical system that learns patterns from examples.'],
+['INJECTION RESISTANCE','I cannot invent or call an unavailable tool. Please use one of the provided tool schemas.']];
+const out=document.querySelector('#out');function show(i){out.textContent=cases[i][0]+'\n\n'+cases[i][1]}document.querySelectorAll('button').forEach(b=>b.onclick=()=>show(+b.dataset.i));show(0);
+</script></body></html>

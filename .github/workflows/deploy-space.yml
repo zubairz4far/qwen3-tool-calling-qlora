@@ -10,25 +10,15 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Install Hugging Face client
-        run: python -m pip install --upgrade huggingface_hub
-
-      - name: Create Space
+      - uses: actions/checkout@v4
+      - run: python -m pip install --upgrade huggingface_hub
+      - name: Create free static Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          hf repos create zubairz4far/qwen3-tool-calling-demo \
-            --type space \
-            --space-sdk gradio \
-            --exist-ok
-
-      - name: Upload Space application
+          hf repos create zubairz4far/qwen3-tool-calling-demo --type space --space-sdk static --exist-ok
+      - name: Upload portfolio showcase
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          hf upload zubairz4far/qwen3-tool-calling-demo space . \
-            --repo-type space \
-            --commit-message "Deploy interactive Qwen3 tool-calling demo"
+          hf upload zubairz4far/qwen3-tool-calling-demo static-space . --repo-type space --commit-message "Deploy Qwen3 tool-calling portfolio showcase"
