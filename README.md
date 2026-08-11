@@ -43,6 +43,49 @@ This experiment treats tool calling as a **behavioral reliability problem**, not
 
 The main win was stronger **exact tool-call construction**, but the behavioral breakdown exposed two important regressions: clarification handling and unnecessary tool invocation. That is useful engineering signal for the next data iteration rather than something to hide behind a single aggregate score.
 
+## Portfolio demo
+
+The repository now includes a ready-to-publish **Gradio Hugging Face Space** in `space/`.
+
+It lets reviewers:
+
+- enter a user request
+- edit the available tool schemas
+- run the QLoRA adapter on top of Qwen3-1.7B
+- inspect the raw generation
+- see a lightweight classification of tool-call vs clarification vs no-tool behavior
+- inspect detected JSON output
+
+The demo files are intentionally separate from the training/evaluation code so V1 remains reproducible.
+
+## V2 hardening workflow
+
+V2 is designed specifically around the weaknesses exposed by V1 rather than simply adding more generic tool calls.
+
+Generate the hardening cases with:
+
+```bash
+python src/generate_v2_cases.py --output data/v2_behavior_cases.jsonl
+```
+
+The generator adds five focused categories:
+
+1. tool-required cases
+2. missing-argument clarification cases
+3. ordinary no-tool cases
+4. hard negatives that mention tools/JSON but should not trigger calls
+5. prompt-injection cases that try to force invented or unrelated tools
+
+Evaluate V2 predictions with:
+
+```bash
+python src/evaluate_behavior_v2.py predictions_v2.jsonl
+```
+
+This evaluator reports overall behavior accuracy, tool selection on tool-required cases, strict exact calls, hallucinated-tool rate on non-tool cases, and per-category accuracy.
+
+See `V2_PLAN.md` for the promotion criteria and experiment design. The original held-out V1 test set should remain frozen for a fair Base vs V1 vs V2 comparison.
+
 ## Training snapshot
 
 - Base model: `Qwen/Qwen3-1.7B`
@@ -88,11 +131,18 @@ flowchart LR
 .
 ├── README.md
 ├── PROJECT_REPORT.md
+├── V2_PLAN.md
+├── HUGGINGFACE_MODEL_CARD.md
 ├── requirements.txt
-├── .gitignore
+├── space/
+│   ├── README.md
+│   ├── app.py
+│   └── requirements.txt
 ├── src/
 │   ├── inference.py
-│   └── evaluate_predictions.py
+│   ├── evaluate_predictions.py
+│   ├── generate_v2_cases.py
+│   └── evaluate_behavior_v2.py
 └── results/
     └── eval_metrics.json
 ```
@@ -133,7 +183,7 @@ python src/evaluate_predictions.py predictions.jsonl
 
 The fine-tune improved structured-call precision substantially, but the behavioral metrics show why agent evaluation must be multi-dimensional. A model can get better at calling tools while simultaneously becoming more eager to call them.
 
-The next iteration should therefore add more **clarification-required**, **no-tool**, and **hard-negative routing** examples, then optimize against a weighted behavior score rather than strict-call accuracy alone.
+The next iteration therefore targets **clarification-required**, **no-tool**, and **hard-negative routing** examples, then compares V2 against the frozen V1 benchmark instead of optimizing against strict-call accuracy alone.
 
 ## Skills demonstrated
 
@@ -145,6 +195,8 @@ The next iteration should therefore add more **clarification-required**, **no-to
 - Agent routing and function-calling reliability
 - Prompt-injection testing
 - Error analysis and iterative model improvement
+- Gradio model demos
+- Reproducible experiment iteration
 
 ## Model artifact
 
