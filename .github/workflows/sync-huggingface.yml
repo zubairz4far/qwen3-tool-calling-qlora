@@ -2,6 +2,18 @@ name: Sync portfolio files to Hugging Face
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - HUGGINGFACE_MODEL_CARD.md
+      - PROJECT_REPORT.md
+      - V2_PLAN.md
+      - requirements.txt
+      - examples/**
+      - results/**
+      - src/**
+      - .github/workflows/sync-huggingface.yml
 
 permissions:
   contents: read
