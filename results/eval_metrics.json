@@ -1,0 +1,27 @@
+{
+  "model": "Qwen3-1.7B + QLoRA adapter",
+  "test_examples": 240,
+  "fine_tuned": {
+    "tool_selection_accuracy": 0.85,
+    "strict_exact_call_accuracy": 0.7417,
+    "argument_exact_accuracy": 0.7417,
+    "argument_kv_accuracy": 0.8049,
+    "tool_parse_validity": 0.85
+  },
+  "improvement_percentage_points_vs_baseline": {
+    "tool_selection_accuracy": 13.33,
+    "strict_exact_call_accuracy": 21.11,
+    "argument_kv_accuracy": 15.93,
+    "tool_parse_validity": 13.33,
+    "no_tool_routing_accuracy": 0.0,
+    "clarification_accuracy": -36.67,
+    "prompt_injection_exact_accuracy": 40.0,
+    "hallucinated_tool_rate_non_tool": 15.0,
+    "overall_routing_accuracy": 2.0,
+    "overall_strict_behavior_accuracy": 5.33
+  },
+  "notes": {
+    "hallucinated_tool_rate_non_tool": "Lower is better; positive change represents a regression.",
+    "clarification_accuracy": "Negative change represents a regression."
+  }
+}
