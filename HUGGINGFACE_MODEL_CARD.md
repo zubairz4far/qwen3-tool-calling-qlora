@@ -21,6 +21,9 @@ tags:
 
 QLoRA adapter fine-tuned from `Qwen/Qwen3-1.7B` for structured tool/function calling, with evaluation covering tool selection, argument generation, clarification behavior, no-tool routing, parse validity, prompt-injection robustness, and tool hallucination.
 
+**Portfolio showcase:** [Qwen3 Tool Calling Lab](https://huggingface.co/spaces/zubairz4far/qwen3-tool-calling-demo)  
+**Source and evaluation:** [zubairz4far/qwen3-tool-calling-qlora](https://github.com/zubairz4far/qwen3-tool-calling-qlora)
+
 ## Model details
 
 - **Base model:** `Qwen/Qwen3-1.7B`

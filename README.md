@@ -45,7 +45,9 @@ The main win was stronger **exact tool-call construction**, but the behavioral b
 
 ## Portfolio demo
 
-The repository now includes a ready-to-publish **Gradio Hugging Face Space** in `space/`.
+Open the live portfolio showcase: **[Qwen3 Tool Calling Lab](https://huggingface.co/spaces/zubairz4far/qwen3-tool-calling-demo)**.
+
+The repository also includes the full Gradio inference application in `space/` for deployment on hosted CPU/GPU compute.
 
 It lets reviewers:
 
@@ -56,7 +58,7 @@ It lets reviewers:
 - see a lightweight classification of tool-call vs clarification vs no-tool behavior
 - inspect detected JSON output
 
-The demo files are intentionally separate from the training/evaluation code so V1 remains reproducible.
+The demo files are intentionally separate from the training/evaluation code so V1 remains reproducible. The public free Space is a transparent static behavior explorer; representative outputs are labeled and are not presented as live inference.
 
 ## V2 hardening workflow
 
