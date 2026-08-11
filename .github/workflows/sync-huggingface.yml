@@ -1,0 +1,32 @@
+name: Sync portfolio files to Hugging Face
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Hugging Face client
+        run: python -m pip install --upgrade huggingface_hub
+
+      - name: Prepare model repository update
+        run: |
+          mkdir -p hf-sync
+          cp HUGGINGFACE_MODEL_CARD.md hf-sync/README.md
+          cp PROJECT_REPORT.md V2_PLAN.md requirements.txt hf-sync/
+          cp -R results src space hf-sync/
+
+      - name: Upload portfolio files
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          hf upload zubairz4far/qwen3-1.7b-tool-calling hf-sync . \
+            --repo-type model \
+            --commit-message "Add portfolio documentation, behavioral evaluation, V2 plan, and demo source"
