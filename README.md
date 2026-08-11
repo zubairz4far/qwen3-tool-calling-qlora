@@ -75,8 +75,37 @@ The generator adds five focused categories:
 1. tool-required cases
 2. missing-argument clarification cases
 3. ordinary no-tool cases
-4. hard negatives that mention tools/JSON but should not trigger calls
+4. hard negatives that mention tools/JSON but should not trigger a call
 5. prompt-injection cases that try to force invented or unrelated tools
+
+Train V2 by continuing from the public V1 adapter and mixing the original V1 training set with the behavioral hardening set:
+
+```bash
+python src/train_v2.py \
+  --v1-train-data /kaggle/input/YOUR_DATASET/train.jsonl \
+  --v2-data data/v2_behavior_cases.jsonl \
+  --validation-data /kaggle/input/YOUR_DATASET/validation.jsonl
+```
+
+`train_v2.py` deliberately has no test-set argument and rejects filenames that look like held-out/test data. The original 240-example V1 test split must remain frozen for the Base vs V1 vs V2 comparison.
+
+By default, V2 continues training from:
+
+```text
+zubairz4far/qwen3-1.7b-tool-calling
+```
+
+and saves the new adapter under:
+
+```text
+outputs/qwen3-1.7b-tool-calling-v2
+```
+
+To publish only after evaluation passes the promotion criteria, rerun training with `--push-to-hub` or upload the saved adapter to:
+
+```text
+zubairz4far/qwen3-1.7b-tool-calling-v2
+```
 
 Evaluate V2 predictions with:
 
@@ -142,6 +171,7 @@ flowchart LR
 │   └── requirements.txt
 ├── src/
 │   ├── inference.py
+│   ├── train_v2.py
 │   ├── evaluate_predictions.py
 │   ├── generate_v2_cases.py
 │   └── evaluate_behavior_v2.py
