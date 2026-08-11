@@ -1,27 +1,61 @@
 {
-  "model": "Qwen3-1.7B + QLoRA adapter",
-  "test_examples": 240,
-  "fine_tuned": {
-    "tool_selection_accuracy": 0.85,
-    "strict_exact_call_accuracy": 0.7417,
-    "argument_exact_accuracy": 0.7417,
-    "argument_kv_accuracy": 0.8049,
-    "tool_parse_validity": 0.85
+  "selected_release": "V1",
+  "base_model": "Qwen/Qwen3-1.7B",
+  "adapter": "zubairz4far/qwen3-1.7b-tool-calling",
+  "controlled_held_out_240": {
+    "examples": 240,
+    "base": {
+      "tool_selection_accuracy": 0.85,
+      "strict_exact_call_accuracy": 0.7417,
+      "argument_kv_accuracy": 0.8049,
+      "tool_parse_validity": 0.85
+    },
+    "v1": {
+      "tool_selection_accuracy": 1.0,
+      "strict_exact_call_accuracy": 0.95,
+      "argument_kv_accuracy": 0.9833,
+      "tool_parse_validity": 1.0
+    }
   },
-  "improvement_percentage_points_vs_baseline": {
-    "tool_selection_accuracy": 13.33,
-    "strict_exact_call_accuracy": 21.11,
-    "argument_kv_accuracy": 15.93,
-    "tool_parse_validity": 13.33,
-    "no_tool_routing_accuracy": 0.0,
-    "clarification_accuracy": -36.67,
-    "prompt_injection_exact_accuracy": 40.0,
-    "hallucinated_tool_rate_non_tool": 15.0,
-    "overall_routing_accuracy": 2.0,
-    "overall_strict_behavior_accuracy": 5.33
+  "locked_final_150": {
+    "examples": 150,
+    "sha256": "5e1cbede7c2f80ee712c36dfee1dcf26b6a4b03e75c5ddc4d8dd3b9e3c5e0b02",
+    "base": {
+      "tool_selection_accuracy": 0.8556,
+      "strict_exact_call_accuracy": 0.7333,
+      "argument_kv_accuracy": 0.8148,
+      "tool_parse_validity": 0.8556,
+      "no_tool_routing_accuracy": 1.0,
+      "clarification_accuracy": 0.3667,
+      "prompt_injection_exact_accuracy": 0.55,
+      "hallucinated_tool_rate_non_tool_and_clarification": 0.25,
+      "overall_routing_accuracy": 0.8133,
+      "overall_strict_behavior_accuracy": 0.7133
+    },
+    "v1": {
+      "tool_selection_accuracy": 0.9889,
+      "strict_exact_call_accuracy": 0.9444,
+      "argument_kv_accuracy": 0.9741,
+      "tool_parse_validity": 0.9889,
+      "no_tool_routing_accuracy": 1.0,
+      "clarification_accuracy": 0.0,
+      "prompt_injection_exact_accuracy": 0.95,
+      "hallucinated_tool_rate_non_tool_and_clarification": 0.4,
+      "overall_routing_accuracy": 0.8333,
+      "overall_strict_behavior_accuracy": 0.7667
+    },
+    "v2": {
+      "tool_selection_accuracy": 0.4444,
+      "strict_exact_call_accuracy": 0.4222,
+      "argument_kv_accuracy": 0.437,
+      "tool_parse_validity": 0.4444,
+      "strict_behavior_failures": 64,
+      "overall_strict_behavior_accuracy": 0.5733,
+      "release_status": "rejected"
+    }
   },
   "notes": {
-    "hallucinated_tool_rate_non_tool": "Lower is better; positive change represents a regression.",
-    "clarification_accuracy": "Negative change represents a regression."
+    "hallucinated_tool_rate": "Lower is better.",
+    "scope": "Synthetic, domain-specific controlled benchmarks; not general real-world accuracy."
   }
 }
