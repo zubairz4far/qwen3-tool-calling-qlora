@@ -1,0 +1,19 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "check_inventory",
+      "description": "Check current inventory for a product SKU.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string",
+            "description": "Product stock-keeping unit"
+          }
+        },
+        "required": ["sku"]
+      }
+    }
+  }
+]
