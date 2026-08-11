@@ -4,3 +4,4 @@ peft>=0.15
 accelerate>=1.2
 bitsandbytes>=0.45
 trl>=0.15
+datasets>=3.0
