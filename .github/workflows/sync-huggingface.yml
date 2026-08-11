@@ -21,7 +21,7 @@ jobs:
           mkdir -p hf-sync
           cp HUGGINGFACE_MODEL_CARD.md hf-sync/README.md
           cp PROJECT_REPORT.md V2_PLAN.md requirements.txt hf-sync/
-          cp -R results src space hf-sync/
+          cp -R examples results src hf-sync/
 
       - name: Upload portfolio files
         env:
@@ -29,4 +29,4 @@ jobs:
         run: |
           hf upload zubairz4far/qwen3-1.7b-tool-calling hf-sync . \
             --repo-type model \
-            --commit-message "Add portfolio documentation, behavioral evaluation, V2 plan, and demo source"
+            --commit-message "Align V1 model card, benchmark metrics, and V2 release decision"
