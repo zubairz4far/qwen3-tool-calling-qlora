@@ -153,3 +153,7 @@ The datasets are synthetic and domain-specific. Reported metrics are therefore *
 ## Stack
 
 Python, PyTorch, Transformers, TRL, PEFT, bitsandbytes, Hugging Face, pandas, NumPy, Kaggle
+
+## Author & related work
+
+Maintained by **Zubair Zafar**, an AI/ML engineer and co-founder of [Pixelense](https://pixelense.com/), a human-led AI product photography and ecommerce visual-production studio.
