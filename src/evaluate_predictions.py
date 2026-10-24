@@ -12,14 +12,42 @@ def parse_args():
 
 
 def exact_dict_match(expected, predicted):
+    """Compare JSON values without Python's bool/int equivalence or missing-null ambiguity."""
+    if type(expected) is not type(predicted):
+        return False
+    if isinstance(expected, dict):
+        return expected.keys() == predicted.keys() and all(
+            exact_dict_match(value, predicted[key]) for key, value in expected.items()
+        )
+    if isinstance(expected, list):
+        return len(expected) == len(predicted) and all(
+            exact_dict_match(left, right) for left, right in zip(expected, predicted)
+        )
     return expected == predicted
 
 
 def kv_accuracy(expected, predicted):
     if not expected:
         return 1.0 if not predicted else 0.0
-    correct = sum(1 for key, value in expected.items() if predicted.get(key) == value)
+    correct = sum(
+        1
+        for key, value in expected.items()
+        if key in predicted and exact_dict_match(value, predicted[key])
+    )
     return correct / len(expected)
+
+
+def _reject_duplicate_keys(pairs):
+    value = {}
+    for key, item in pairs:
+        if key in value:
+            raise ValueError(f"duplicate JSON key: {key}")
+        value[key] = item
+    return value
+
+
+def _reject_nonfinite(value):
+    raise ValueError(f"non-finite JSON constant: {value}")
 
 
 def validate_row(row, line_number):
@@ -91,7 +119,14 @@ def main():
         with Path(args.predictions).open("r", encoding="utf-8") as f:
             for line_number, raw in enumerate(f, start=1):
                 if raw.strip():
-                    row = json.loads(raw)
+                    try:
+                        row = json.loads(
+                            raw,
+                            object_pairs_hook=_reject_duplicate_keys,
+                            parse_constant=_reject_nonfinite,
+                        )
+                    except ValueError as exc:
+                        raise ValueError(f"line {line_number}: {exc}") from exc
                     rows.append(validate_row(row, line_number))
         metrics = evaluate(rows)
     except (ValueError, json.JSONDecodeError) as exc:

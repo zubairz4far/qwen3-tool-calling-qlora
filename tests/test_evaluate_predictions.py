@@ -130,3 +130,41 @@ class EvaluatePredictionsEvidenceValidationTests(unittest.TestCase):
     def test_rejects_non_object_jsonl_row(self):
         with self.assertRaisesRegex(ValueError, "JSON object"):
             evaluator.validate_row(["not", "an", "object"], 1)
+
+
+class StrictJsonEvidenceTests(unittest.TestCase):
+    def test_boolean_is_not_integer_for_exact_match_or_kv(self):
+        expected = {"limit": 1, "options": [{"enabled": True}]}
+        predicted = {"limit": True, "options": [{"enabled": 1}]}
+        self.assertFalse(evaluator.exact_dict_match(expected, predicted))
+        self.assertEqual(evaluator.kv_accuracy(expected, predicted), 0.0)
+
+    def test_missing_null_key_does_not_get_credit(self):
+        self.assertFalse(evaluator.exact_dict_match({"note": None}, {}))
+        self.assertEqual(evaluator.kv_accuracy({"note": None}, {}), 0.0)
+        self.assertEqual(evaluator.kv_accuracy({"note": None}, {"note": None}), 1.0)
+
+    def test_cli_rejects_duplicate_jsonl_keys_and_reports_line(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "predictions.jsonl"
+            path.write_text('{"expected_tool": null, "expected_tool": "get_order", "predicted_tool": null}\n')
+            completed = subprocess.run(
+                [sys.executable, str(EVALUATOR_PATH), str(path)],
+                capture_output=True,
+                text=True,
+            )
+        self.assertNotEqual(completed.returncode, 0)
+        self.assertIn("line 1", completed.stderr)
+        self.assertIn("duplicate JSON key", completed.stderr)
+
+    def test_cli_rejects_nonfinite_metric_evidence(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "predictions.jsonl"
+            path.write_text('{"expected_tool": null, "predicted_tool": null, "expected_args": {"score": NaN}}\n')
+            completed = subprocess.run(
+                [sys.executable, str(EVALUATOR_PATH), str(path)],
+                capture_output=True,
+                text=True,
+            )
+        self.assertNotEqual(completed.returncode, 0)
+        self.assertIn("non-finite JSON constant", completed.stderr)
