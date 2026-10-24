@@ -77,3 +77,56 @@ class EvaluatePredictionsCliTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class EvaluatePredictionsEvidenceValidationTests(unittest.TestCase):
+    def test_rejects_missing_tool_labels_that_previously_counted_as_correct(self):
+        with self.assertRaisesRegex(ValueError, "missing required field expected_tool"):
+            evaluator.validate_row({"predicted_tool": None}, 3)
+        with self.assertRaisesRegex(ValueError, "missing required field predicted_tool"):
+            evaluator.validate_row({"expected_tool": None}, 3)
+
+    def test_rejects_malformed_argument_payloads(self):
+        row = {
+            "expected_tool": "get_order",
+            "predicted_tool": "get_order",
+            "expected_args": {"order_id": "A"},
+            "predicted_args": ["not", "a", "dict"],
+        }
+        with self.assertRaisesRegex(ValueError, "predicted_args"):
+            evaluator.validate_row(row, 2)
+
+    def test_rejects_tool_rows_with_missing_argument_field(self):
+        row = {"expected_tool": "get_order", "predicted_tool": "get_order"}
+        with self.assertRaisesRegex(ValueError, "expected_args"):
+            evaluator.validate_row(row, 1)
+
+    def test_measures_unexpected_calls_separately_from_strict_accuracy(self):
+        rows = [
+            evaluator.validate_row(
+                {
+                    "expected_tool": None,
+                    "predicted_tool": None,
+                    "expected_args": {},
+                    "predicted_args": {},
+                },
+                1,
+            ),
+            evaluator.validate_row(
+                {
+                    "expected_tool": None,
+                    "predicted_tool": "get_order",
+                    "expected_args": {},
+                    "predicted_args": {"order_id": "invented"},
+                },
+                2,
+            ),
+        ]
+        metrics = evaluator.evaluate(rows)
+        self.assertEqual(metrics["non_tool_examples"], 2)
+        self.assertEqual(metrics["unexpected_tool_calls_on_non_tool_cases"], 1)
+        self.assertEqual(metrics["hallucinated_tool_rate_on_non_tool_cases"], 0.5)
+
+    def test_rejects_non_object_jsonl_row(self):
+        with self.assertRaisesRegex(ValueError, "JSON object"):
+            evaluator.validate_row(["not", "an", "object"], 1)
