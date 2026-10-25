@@ -1,5 +1,5 @@
 torch>=2.3
 transformers>=4.51
-peft>=0.15
+peft>=0.21.2
 accelerate>=1.2
 gradio>=5.0
