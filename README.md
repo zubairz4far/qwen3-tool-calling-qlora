@@ -5,6 +5,10 @@ This project fine-tunes **Qwen3-1.7B** for structured tool calling across seven 
 
 The main lesson is not only that fine-tuning improved tool execution. It also exposed a real post-training trade-off: the strongest tool-calling model became too eager to call tools when required information was missing. A corrective V2 experiment then over-corrected and became too conservative. The final release decision therefore keeps **V1** and documents the remaining clarification limitation instead of hiding it.
 
+## V3 research pipeline (candidate, not a model release)
+
+See [V3 experiment protocol](docs/V3_EXPERIMENT.md) for the versioned seven-tool contract, deterministic train/development generation, shared Qwen prompt/output protocol, pinned-revision QLoRA trainer and real-model development evaluator. V1 remains selected; no V3 training or final benchmark result is claimed.
+
 ## Selected model
 
 **Release:** `zubairz4far/qwen3-1.7b-tool-calling`  
