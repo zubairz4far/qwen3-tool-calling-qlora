@@ -55,6 +55,17 @@ def main():
     base.config.use_cache=False
     base=prepare_model_for_kbit_training(base,use_gradient_checkpointing=True)
     model=PeftModel.from_pretrained(base,C["initial_adapter"],revision=a.adapter_revision,is_trainable=True)
+    # T4 FP16 GradScaler requires FP32 trainable adapter storage, even if
+    # the source adapter or base checkpoint was saved in BF16.
+    from collections import Counter
+    with torch.no_grad():
+        for parameter in model.parameters():
+            if parameter.requires_grad:
+                parameter.data = parameter.data.to(dtype=torch.float32)
+    trainable_dtypes = Counter(str(p.dtype) for p in model.parameters() if p.requires_grad)
+    if not trainable_dtypes or set(trainable_dtypes) != {"torch.float32"}:
+        raise RuntimeError(f"Expected FP32 trainable parameters, got {trainable_dtypes}")
+    print("Trainable parameter tensor dtypes:", dict(trainable_dtypes), flush=True)
     model.print_trainable_parameters()
     config=SFTConfig(output_dir=str(a.output),num_train_epochs=C["epochs"],learning_rate=C["learning_rate"],
         per_device_train_batch_size=C["batch_size"],per_device_eval_batch_size=C["batch_size"],
@@ -69,6 +80,7 @@ def main():
     summary={"status":"candidate_unvalidated","base_revision":a.base_revision,"adapter_revision":a.adapter_revision,
         "dataset_manifest_sha256":hashlib.sha256((a.data/"manifest.json").read_bytes()).hexdigest(),
         "experiment":C,"gpu":torch.cuda.get_device_name(0),"metrics":result.metrics,
+        "trainable_parameter_tensor_dtypes":dict(trainable_dtypes),
         "versions":{n:importlib.metadata.version(n) for n in ["torch","transformers","trl","peft","bitsandbytes","datasets","accelerate"]}}
     (a.output/"training_summary.json").write_text(json.dumps(summary,indent=2)+"\n")
 
